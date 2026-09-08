@@ -1,0 +1,4 @@
+customtkinter
+reportlab
+pyinstaller
+pytest
