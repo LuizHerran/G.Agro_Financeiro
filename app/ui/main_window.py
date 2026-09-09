@@ -1,13 +1,17 @@
 import customtkinter as ctk
 from app.ui.history_view import HistoryView
 from app.ui.transaction_form import TransactionForm
-
+from pathlib import Path
 
 class MainWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("G.Agro")
+        
+        icon_path = Path(__file__).parent / "assets" / "logo.ico"
+        self.iconbitmap(icon_path)
+        
         self.geometry("900x600")
         self.minsize(800, 650)
 

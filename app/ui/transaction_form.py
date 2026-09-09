@@ -1,17 +1,32 @@
-import customtkinter as ctk
+from datetime import date
+from pathlib import Path
 
-from app.services.transactions import (create_expense, create_income,)
+import customtkinter as ctk
+from PIL import Image
+
+from app.services.transactions import ( create_expense, create_income,)
+from app.ui.date_picker import DatePicker
 from app.utils.dates import ( brazil_date_to_database, today_brazil,)
 from app.utils.money import parse_money
 
 
 class TransactionForm(ctk.CTkFrame):
-    def __init__(
-        self,
-        parent,
-        transaction_type: str,
-        on_back,
-    ):
+    def __init__( self, parent, transaction_type: str, on_back,):
+        self.transaction_type = transaction_type
+        self.on_back = on_back
+
+        assets_dir = Path(__file__).resolve().parent / "assets"
+
+        self.calendar_icon = ctk.CTkImage(
+            light_image=Image.open(
+                assets_dir / "calendar.png"
+            ),
+            dark_image=Image.open(
+                assets_dir / "calendar.png"
+            ),
+            size=(20, 20),
+        )
+
         super().__init__(parent)
 
         if transaction_type not in ("GANHO", "GASTO"):
@@ -26,6 +41,52 @@ class TransactionForm(ctk.CTkFrame):
             title = "Registrar Gasto"
 
         self._create_widgets(title)
+
+    def _open_date_picker(self):
+
+        initial_date = date.today()
+
+        value = self.date_entry.get().strip()
+
+        if value:
+            try:
+                initial_date = date.fromisoformat(
+                    brazil_date_to_database(value)
+                )
+            except ValueError:
+                initial_date = date.today()
+
+        picker = DatePicker(
+            self,
+            initial_date=initial_date,
+            on_select=self._set_date,
+        )
+
+        picker.place(
+            relx=0.5,
+            rely=0.55,
+            anchor="center",
+        )
+
+        self._date_picker = picker
+
+    def _set_date(self, selected_date):
+
+        if selected_date > date.today():
+            self._show_message(
+                "A data não pode ser futura."
+            )
+            return
+
+        self.date_entry.delete(
+            0,
+            "end",
+        )
+
+        self.date_entry.insert(
+            0,
+            selected_date.strftime("%d/%m/%Y"),
+        )
 
     def _create_widgets(self, title: str):
         self.grid_columnconfigure(0, weight=1)
@@ -107,11 +168,12 @@ class TransactionForm(ctk.CTkFrame):
             sticky="w",
         )
 
-        self.date_entry = ctk.CTkEntry(
+        date_frame = ctk.CTkFrame(
             self,
-            height=40,
+            fg_color="transparent",
         )
-        self.date_entry.grid(
+
+        date_frame.grid(
             row=6,
             column=0,
             padx=30,
@@ -119,7 +181,41 @@ class TransactionForm(ctk.CTkFrame):
             sticky="ew",
         )
 
-        self.date_entry.insert(0, today_brazil())
+        date_frame.grid_columnconfigure(
+            0,
+            weight=1,
+        )
+
+        self.date_entry = ctk.CTkEntry(
+            date_frame,
+            height=40,
+        )
+
+        self.date_entry.grid(
+            row=0,
+            column=0,
+            sticky="ew",
+        )
+
+        calendar_button = ctk.CTkButton(
+            date_frame,
+            text="",
+            image=self.calendar_icon,
+            width=45,
+            height=40,
+            command=self._open_date_picker,
+        )
+
+        calendar_button.grid(
+            row=0,
+            column=1,
+            padx=(8, 0),
+        )
+
+        self.date_entry.insert(
+            0,
+            today_brazil(),
+        )
 
         self.message_label = ctk.CTkLabel(
             self,

@@ -2,3 +2,6 @@ customtkinter
 reportlab
 pyinstaller
 pytest
+pillow
+openpyxl
+reportlab
