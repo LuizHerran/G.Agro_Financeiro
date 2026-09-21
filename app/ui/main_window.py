@@ -1,19 +1,39 @@
 import customtkinter as ctk
+
+
 from app.ui.history_view import HistoryView
 from app.ui.transaction_form import TransactionForm
 from pathlib import Path
+from app.utils.resources import resource_path
+from app.utils.version import APP_VERSION
+
 
 class MainWindow(ctk.CTk):
     def __init__(self):
         super().__init__()
 
         self.title("G.Agro")
-        
-        icon_path = Path(__file__).parent / "assets" / "logo.ico"
-        self.iconbitmap(icon_path)
+
+        icon_path = resource_path("app/ui/assets/logo.ico")
+        self.iconbitmap(str(icon_path))
         
         self.geometry("900x600")
         self.minsize(800, 650)
+
+        self.update_idletasks()
+
+        window_width = 900
+        window_height = 600
+
+        screen_width = self.winfo_screenwidth()
+        screen_height = self.winfo_screenheight()
+
+        position_x = (screen_width - window_width) // 2
+        position_y = (screen_height - window_height) // 2
+
+        self.geometry(
+            f"{window_width}x{window_height}+{position_x}+{position_y}"
+        )
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(1, weight=1)
@@ -47,6 +67,24 @@ class MainWindow(ctk.CTk):
         self.content.grid_rowconfigure(
             1,
             weight=1,
+        )
+        
+        footer = ctk.CTkFrame(self, fg_color="transparent")
+        footer.grid(
+            row=2,
+            column=0,
+            padx=20,
+            pady=(0, 8),
+            sticky="ew",
+        )
+
+        version_label = ctk.CTkLabel(
+            footer,
+            text=f"v{APP_VERSION}",
+        )
+        version_label.pack(
+            side="right",
+            padx=5,
         )
 
         self.show_home()
@@ -188,3 +226,4 @@ class MainWindow(ctk.CTk):
             columnspan=2,
             sticky="nsew",
         )
+        

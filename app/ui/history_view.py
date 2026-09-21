@@ -3,7 +3,6 @@ import customtkinter as ctk
 from app.reports.periods import get_current_month_period
 from app.utils.dates import ( brazil_date_to_database, database_date_to_brazil, today_brazil,)
 from app.ui.date_picker import DatePicker
-from tkinter import filedialog
 from app.services.transactions import ( calculate_summary, cancel_transaction, get_transactions,)
 from app.utils.money import ( cents_to_money, parse_money,)
 from app.reports.history_csv import generate_history_csv
@@ -11,6 +10,7 @@ from app.reports.history_excel import generate_history_excel
 from tkinter import filedialog, messagebox
 from datetime import date
 from app.reports.history_pdf import generate_history_pdf
+from app.utils.resources import resource_path
 
 from PIL import Image
 
@@ -24,10 +24,14 @@ class HistoryView(ctk.CTkFrame):
         self.grid_columnconfigure(0, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
+        self.calendar_image_path = resource_path(
+            "app/ui/assets/calendar.png"
+        )
+
         self.calendar_icon = ctk.CTkImage(
-            light_image=Image.open("app/ui/assets/calendar.png"),
-            dark_image=Image.open("app/ui/assets/calendar.png"),
-            size=(22, 22),
+            light_image=Image.open(self.calendar_image_path),
+            dark_image=Image.open(self.calendar_image_path),
+            size=(20, 20),
         )
 
         self._create_header()
@@ -100,7 +104,9 @@ class HistoryView(ctk.CTkFrame):
         )
 
     def _create_filters(self):
+
         filters = ctk.CTkFrame(self)
+
         filters.grid(
             row=1,
             column=0,
@@ -113,7 +119,10 @@ class HistoryView(ctk.CTkFrame):
         filters.grid_columnconfigure(3, weight=1)
         filters.grid_columnconfigure(5, weight=1)
 
-        # Data inicial
+        # =========================================================
+        # DATA INICIAL
+        # =========================================================
+
         start_label = ctk.CTkLabel(
             filters,
             text="Data inicial",
@@ -171,65 +180,10 @@ class HistoryView(ctk.CTkFrame):
             padx=(5, 0),
         )
 
-        start_date_frame.grid_columnconfigure(0, weight=1)
+        # =========================================================
+        # DATA FINAL
+        # =========================================================
 
-        end_date_frame = ctk.CTkFrame(
-            filters,
-            fg_color="transparent",
-        )
-
-        end_date_frame.grid(
-            row=0,
-            column=3,
-            padx=5,
-            pady=(10, 5),
-            sticky="ew",
-        )
-
-        end_date_frame.grid_columnconfigure(0, weight=1)
-
-        self.end_date_entry = ctk.CTkEntry(
-            end_date_frame,
-            placeholder_text="DD/MM/AAAA",
-        )
-
-        self.end_date_entry.grid(
-            row=0,
-            column=0,
-            sticky="ew",
-        )
-
-        end_calendar_button = ctk.CTkButton(
-            end_date_frame,
-            text="",
-            image=self.calendar_icon,
-            width=40,
-            height=32,
-            command=self._open_end_date_picker,
-        )
-
-        end_calendar_button.grid(
-            row=0,
-            column=1,
-            padx=(5, 0),
-        )
-
-        start_calendar_button = ctk.CTkButton(
-            start_date_frame,
-            text="",
-            image=self.calendar_icon,
-            width=40,
-            height=32,
-            command=self._open_start_date_picker,
-        )
-
-        start_calendar_button.grid(
-            row=0,
-            column=1,
-            padx=(5, 0),
-        )
-
-        # Data final
         end_label = ctk.CTkLabel(
             filters,
             text="Data final",
@@ -287,11 +241,15 @@ class HistoryView(ctk.CTkFrame):
             padx=(5, 0),
         )
 
-        # Tipo
+        # =========================================================
+        # TIPO
+        # =========================================================
+
         type_label = ctk.CTkLabel(
             filters,
             text="Tipo",
         )
+
         type_label.grid(
             row=0,
             column=4,
@@ -308,6 +266,7 @@ class HistoryView(ctk.CTkFrame):
                 "GASTO",
             ],
         )
+
         self.type_combobox.grid(
             row=0,
             column=5,
@@ -315,13 +274,18 @@ class HistoryView(ctk.CTkFrame):
             pady=(10, 5),
             sticky="ew",
         )
+
         self.type_combobox.set("Todos")
 
-        # Descrição
+        # =========================================================
+        # DESCRIÇÃO
+        # =========================================================
+
         description_label = ctk.CTkLabel(
             filters,
             text="Descrição",
         )
+
         description_label.grid(
             row=1,
             column=0,
@@ -334,6 +298,7 @@ class HistoryView(ctk.CTkFrame):
             filters,
             placeholder_text="Pesquisar descrição",
         )
+
         self.description_entry.grid(
             row=1,
             column=1,
@@ -342,11 +307,15 @@ class HistoryView(ctk.CTkFrame):
             sticky="ew",
         )
 
-        # Valor mínimo
+        # =========================================================
+        # VALOR MÍNIMO
+        # =========================================================
+
         min_value_label = ctk.CTkLabel(
             filters,
             text="Valor mínimo",
         )
+
         min_value_label.grid(
             row=1,
             column=2,
@@ -359,6 +328,7 @@ class HistoryView(ctk.CTkFrame):
             filters,
             placeholder_text="Ex.: 50,00",
         )
+
         self.min_value_entry.grid(
             row=1,
             column=3,
@@ -367,11 +337,15 @@ class HistoryView(ctk.CTkFrame):
             sticky="ew",
         )
 
-        # Valor máximo
+        # =========================================================
+        # VALOR MÁXIMO
+        # =========================================================
+
         max_value_label = ctk.CTkLabel(
             filters,
             text="Valor máximo",
         )
+
         max_value_label.grid(
             row=1,
             column=4,
@@ -384,6 +358,7 @@ class HistoryView(ctk.CTkFrame):
             filters,
             placeholder_text="Ex.: 500,00",
         )
+
         self.max_value_entry.grid(
             row=1,
             column=5,

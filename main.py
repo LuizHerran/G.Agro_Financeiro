@@ -6,7 +6,9 @@ from app.reports.automatic_reports import ( generate_monthly_report, generate_we
 from app.ui.app import run_app
 from app.utils.scheduler import create_all_tasks
 
+
 def main() -> None:
+    
     initialize_database()
 
     if "--weekly-report" in sys.argv:
