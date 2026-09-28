@@ -43,6 +43,8 @@ class DatePicker(ctk.CTkFrame):
             corner_radius=12,
             border_width=1,
         )
+        self.grid_propagate(False)
+        self.pack_propagate(False)
 
         self.on_select = on_select
 
